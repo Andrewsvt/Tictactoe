@@ -1,11 +1,11 @@
 const winRows = [];
-let move_counter = 0;
+let step_counter = 0;
 
 let arr_undo = [];
 let arr_redo = [];
 
-if (localStorage.getItem("move")) {
-  turn = +localStorage.getItem("move");
+if (localStorage.getItem("step")) {
+  turn = +localStorage.getItem("step");
 }
 if (localStorage.getItem("UndoArray")) {
   arr_undo = JSON.parse(localStorage.getItem("UndoArray"));
@@ -35,18 +35,18 @@ for (x = 0; x < size; x++) {
 //X or 0 print func
 function print(e) {
   if (e.target.className === "cell") {
-    if (move_counter % 2 === 0) {
+    if (step_counter % 2 === 0) {
       e.target.classList.add("ch");
       arr_undo.push(new History(e.target.id, "ch"));
     }
-    if (move_counter % 2 !== 0) {
+    if (step_counter % 2 !== 0) {
       e.target.classList.add("r");
       arr_undo.push(new History(e.target.id, "r"));
     }
     check();
-    move_counter++;
+    step_counter++;
 
-    localStorage.setItem("move", move_counter);
+    localStorage.setItem("step", step_counter);
     localStorage.setItem("UndoArray", JSON.stringify(arr_undo));
     arr_redo = [];
     localStorage.setItem("RedoArray", JSON.stringify(arr_redo));
@@ -56,10 +56,10 @@ function print(e) {
   }
 
   //undo enable
-  if (move_counter > 0) {
+  if (step_counter > 0) {
     document.querySelector(".undo-btn").disabled = false;
   }
-  if (move_counter <= 0) {
+  if (step_counter <= 0) {
     document.querySelector(".undo-btn").disabled = true;
   }
 }
@@ -69,7 +69,7 @@ window.addEventListener("click", print);
 document.querySelector(".undo-btn").addEventListener("click", function(event) {
   let obj_undo = arr_undo.pop();
   document.getElementById(obj_undo.id).classList.remove(obj_undo.type);
-  move_counter--;
+  step_counter--;
   arr_redo.push(obj_undo);
 
   document.querySelector(".redo-btn").disabled = false;
@@ -79,7 +79,7 @@ document.querySelector(".undo-btn").addEventListener("click", function(event) {
 document.querySelector(".redo-btn").addEventListener("click", function(event) {
   let obj_redo = arr_redo.pop();
   document.getElementById(obj_redo.id).classList.add(obj_redo.type);
-  move_counter++;
+  step_counter++;
   arr_undo.push(obj_redo);
 
   if (arr_redo.length == 0) {
@@ -96,11 +96,11 @@ function History(id, type) {
 function win(x, y) {
   document.querySelector(".won-title").classList.remove("hidden");
 
-  if (move_counter % 2 === 0) {
+  if (step_counter % 2 === 0) {
     let message_box = document.querySelector(".won-message");
     message_box.innerHTML = "Crosses won!";
   }
-  if (move_counter % 2 !== 0) {
+  if (step_counter % 2 !== 0) {
     let message_box = document.querySelector(".won-message");
     message_box.innerHTML = "Toes won!";
   }
@@ -140,7 +140,7 @@ function draw() {
 }
 
 document.querySelector(".restart-btn").addEventListener("click", function(event) {
-  move_counter = 0;
+  step_counter = 0;
   arr_undo = [];
   arr_redo = [];
   document.querySelector(".won-title").classList.add("hidden");
@@ -153,7 +153,7 @@ document.querySelector(".restart-btn").addEventListener("click", function(event)
 
 function check() {
   let winCells = [];
-  let player = move_counter % 2 === 0 ? "ch" : "r";
+  let player = step_counter % 2 === 0 ? "ch" : "r";
 
   //horizontal matches
   for (x = 0; x < size; x++) {
